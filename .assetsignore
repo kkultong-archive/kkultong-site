@@ -3,3 +3,6 @@ README.md
 .assetsignore
 .git
 .github
+src
+*.py
+__pycache__
