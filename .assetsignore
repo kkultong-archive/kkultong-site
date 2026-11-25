@@ -6,3 +6,4 @@ README.md
 src
 *.py
 __pycache__
+*.tar.gz
