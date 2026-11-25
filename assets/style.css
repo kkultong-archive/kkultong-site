@@ -82,4 +82,5 @@ details{border-top:1px solid var(--line);padding:11px 0}summary{font-weight:800;
 .sitem{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:11px 0;border-top:1px solid var(--line)}
 .sitem .qty{color:var(--honey-d);font-weight:800}.sbtn{font-size:14px;padding:9px 12px;min-height:40px;white-space:nowrap;flex:none}.sbtn.off{background:#eee;color:#999;cursor:default}
 
-.ads-off .ad{display:none!important}.ads-off{padding-bottom:0}
+/* 애드센스 승인 전: 광고 자리 숨김 (승인 후 body.ads-on 이면 표시) */
+body:not(.ads-on) .ad{display:none!important}body:not(.ads-on){padding-bottom:0}
