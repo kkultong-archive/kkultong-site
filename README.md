@@ -1,3 +1,7 @@
-# 꿀통 아카이브
+# 꿀통 아카이브 (kkultongarchive.com)
 
-https://kkultongarchive.com — 다있네. 생활 계산기·도구 모음.
+배포 방식: 사이트 원본은 드라이브 `꿀통아카이브/kkultong_src.tar.gz`에 있고,
+클라우드플레어 배포 때 wrangler.jsonc의 build 명령이 원본을 받아 `python3 build.py`로 페이지를 만듭니다.
+원본을 바꾼 뒤 이 저장소에 아무 커밋이나 올리면 다시 배포됩니다.
+
+마지막 배포 요청: 2026-11-26 07:56 KST
