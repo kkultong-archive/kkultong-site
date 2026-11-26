@@ -7,3 +7,5 @@ src
 *.py
 __pycache__
 *.tar.gz
+worker.js
+node_modules
