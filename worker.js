@@ -16,7 +16,7 @@ export class Stats extends DurableObject {
     const q = (s, ...b) => this.sql.exec(s, ...b).toArray();
     return {
       days: q("SELECT d, COUNT(*) pv, COUNT(DISTINCT v) uv FROM hits WHERE d>=? GROUP BY d ORDER BY d DESC", from),
-      pages: q("SELECT path, MAX(t) t, COUNT(*) pv, COUNT(DISTINCT d||v) uv FROM hits WHERE d>=? GROUP BY path ORDER BY pv DESC LIMIT 80", from),
+      pages: q("SELECT path, MAX(CASE WHEN t LIKE '%찾을 수 없%' THEN NULL ELSE t END) t, MAX(CASE WHEN t LIKE '%찾을 수 없%' THEN 1 ELSE 0 END) nf, COUNT(*) pv, COUNT(DISTINCT d||v) uv FROM hits WHERE d>=? GROUP BY path ORDER BY pv DESC LIMIT 80", from),
       srcs: q("SELECT src, COUNT(*) pv, COUNT(DISTINCT d||v) uv FROM hits WHERE d>=? AND src<>'' GROUP BY src ORDER BY pv DESC", from),
       refs: q("SELECT ref, COUNT(*) pv FROM hits WHERE d>=? AND ref<>'' GROUP BY ref ORDER BY pv DESC LIMIT 30", from),
       total: q("SELECT COUNT(*) pv, COUNT(DISTINCT d||v) uv FROM hits WHERE d>=?", from)[0],
@@ -35,7 +35,7 @@ export default {
     const stub = () => env.STATS.get(env.STATS.idFromName("main"));
     if (u.pathname === "/api/hit") {
       const ua = req.headers.get("user-agent") || "";
-      if (!/bot|crawl|spider|slurp|preview|monitor|headless|lighthouse/i.test(ua)) {
+      if (!/bot|crawl|spider|slurp|preview|monitor|headless|lighthouse|mediapartners|google-|adsense|yeti|daum/i.test(ua)) {
         const now = Date.now(), d = kst(now);
         const p = (u.searchParams.get("p") || "/").slice(0, 200), f = (u.searchParams.get("f") || "").slice(0, 40), r = (u.searchParams.get("r") || "").slice(0, 100), t = (u.searchParams.get("t") || "").slice(0, 80);
         const v = (await sha((req.headers.get("cf-connecting-ip") || "") + "|" + ua + "|" + d + "|kt")).slice(0, 16);
@@ -49,7 +49,7 @@ export default {
       const from = kst(Date.now() - (n - 1) * 86400e3);
       const R = await stub().report(from);
       const k = encodeURIComponent(u.searchParams.get("k"));
-      const nm = (x) => (x.t || NAMES[x.path] || x.path).replace(" (2026)", "") + (x.path === "/" ? "" : "");
+      const nm = (x) => (NAMES[x.path] || x.t || (x.nf ? "없는 주소(404) " + x.path : x.path)).replace(" (2026)", "");
       const html = '<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><title>꿀통 방문 통계</title><style>body{font-family:system-ui,sans-serif;margin:16px;color:#2a1e0f;background:#fffaf0}table{border-collapse:collapse;width:100%;max-width:720px;margin-bottom:18px;background:#fff}th,td{border-bottom:1px solid #eadfcb;padding:7px 6px;text-align:right;font-size:14px}th:first-child,td:first-child{text-align:left;word-break:break-all}h1{font-size:20px}h2{font-size:16px;margin:18px 0 6px}a{color:#c97a00;margin-right:10px}.big{font-size:18px;font-weight:800}</style></head><body>' +
         "<h1>꿀통 아카이브 방문 통계 (최근 " + n + "일, 한국 시간)</h1>" +
         "<p>" + [1, 7, 14, 30, 90].map(x => '<a href="?k=' + k + "&days=" + x + '">' + x + "일</a>").join("") + "</p>" +
